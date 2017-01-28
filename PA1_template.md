@@ -24,11 +24,26 @@ hist(totalSteps$steps)
 meanSteps <- mean(totalSteps$steps)
 medianSteps <- median(totalSteps$steps)
 ```
+
 * The mean of the total number of steps taken per day is: 10766.2
 * The median of the total number of steps taken per day is: 10765
 
+
 ## What is the average daily activity pattern?
 
+```r
+stepsToInterval <- aggregate(steps ~ interval, data = walkdata, mean, na.rm = TRUE)
+plot(steps ~ interval, data = stepsToInterval, type = "l")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+
+```r
+max5Minute <- stepsToInterval[which.max(stepsToInterval$steps), ]$interval
+```
+
+* The 5-minute interval which on average across all the days in the dataset, contains the maximum number of steps is: 835
 
 
 ## Imputing missing values
