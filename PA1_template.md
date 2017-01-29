@@ -14,8 +14,13 @@ walkdata <- read.csv("activity.csv")
 ## What is the mean total number of steps taken per day?
 
 ```r
-totalSteps <- aggregate(steps ~ date, data = walkdata, sum, na.rm = TRUE)
-hist(totalSteps$steps)
+totalSteps <- aggregate(steps~date, data=walkdata, sum, na.rm=TRUE)
+hist(totalSteps$steps, 
+     main="Mean total steps taken per day", 
+     xlab="Steps", 
+     ylab="Number of Days", 
+     ylim=c(0,35),
+     col="blue")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
@@ -32,15 +37,15 @@ medianSteps <- median(totalSteps$steps)
 ## What is the average daily activity pattern?
 
 ```r
-stepsToInterval <- aggregate(steps ~ interval, data = walkdata, mean, na.rm = TRUE)
-plot(steps ~ interval, data = stepsToInterval, type = "l")
+stepsToInterval <- aggregate(steps~interval, data=walkdata, mean, na.rm=TRUE)
+plot(steps~interval,data=stepsToInterval,type="l")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 
 ```r
-max5Minute <- stepsToInterval[which.max(stepsToInterval$steps), ]$interval
+max5Minute <- stepsToInterval[which.max(stepsToInterval$steps),]$interval
 ```
 
 * The 5-minute interval which on average across all the days in the dataset, contains the maximum number of steps is: 835
@@ -59,12 +64,12 @@ totalMissing <- sum(is.na(walkdata$steps))
 allTimeSlots <- unique(walkdata$interval)
 newdata <- walkdata
 
-## Set missing data to the average number of steps for that time slot where
-## there is not missing data This strategy is the mean for that 5-minute
-## interval
+## Set missing data to the average number of steps for that time slot
+## where there is not missing data
+## This strategy is the mean for that 5-minute interval
 setMissingData <- function(timeSlot) {
-    newdata[which(walkdata$interval == timeSlot & is.na(walkdata$steps)), ]$steps <<- mean(walkdata[which(walkdata$interval == 
-        timeSlot & !is.na(walkdata$steps)), ]$steps)
+    newdata[which(walkdata$interval==timeSlot & is.na(walkdata$steps)), ]$steps <<- 
+        mean(walkdata[which(walkdata$interval==timeSlot & !is.na(walkdata$steps)), ]$steps)
 }
 
 lapply(allTimeSlots, setMissingData)
@@ -72,8 +77,13 @@ lapply(allTimeSlots, setMissingData)
 
 
 ```r
-totalNewSteps <- aggregate(steps ~ date, data = newdata, sum, na.rm = TRUE)
-hist(totalNewSteps$steps)
+totalNewSteps <- aggregate(steps~date, data=newdata, sum, na.rm=TRUE)
+hist(totalNewSteps$steps, 
+     main="Mean total steps taken per day (with NA values imputed)", 
+     xlab="Steps", 
+     ylab="Number of Days", 
+     ylim=c(0,35),
+     col="green")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
@@ -87,6 +97,20 @@ medianNewSteps <- median(totalNewSteps$steps)
     10766.2
 * The imputed median of the total number of steps taken per day is: 
     10766.2
+
+## Do these values differ from the estimates from the first part of the assignment? 
+## What is the impact of imputing missing data on the estimates of the total daily number of steps?
+As can be seen by comparing the two histograms, the impact of imputing values 
+based on averages per day is that the number of days with a step count between 
+10,000 and 15,000 steps has increased to over 35 - whereas before imputing the 
+values, the number of days in this range was below 30. The mean number of steps 
+has not changes and this is due to the algortihm making use of the mean number 
+of steps to impute values. However the median has increased in line with an 
+increase in the total number of steps.
+
+
+
+
 
 
 ## Are there differences in activity patterns between weekdays and weekends?

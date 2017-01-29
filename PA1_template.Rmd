@@ -8,7 +8,7 @@ output:
 ---
 
 ```{r setoptions, echo=FALSE}
-knitr::opts_chunk$set(echo=TRUE,tidy=TRUE)
+knitr::opts_chunk$set(echo=TRUE)
 ```
 
 ## Loading and preprocessing the data
@@ -22,7 +22,12 @@ walkdata <- read.csv("activity.csv")
 ## What is the mean total number of steps taken per day?
 ```{r}
 totalSteps <- aggregate(steps~date, data=walkdata, sum, na.rm=TRUE)
-hist(totalSteps$steps)
+hist(totalSteps$steps, 
+     main="Mean total steps taken per day", 
+     xlab="Steps", 
+     ylab="Number of Days", 
+     ylim=c(0,35),
+     col="blue")
 
 meanSteps <- mean(totalSteps$steps)
 medianSteps <- median(totalSteps$steps)
@@ -69,7 +74,12 @@ lapply(allTimeSlots, setMissingData)
 
 ```{r}
 totalNewSteps <- aggregate(steps~date, data=newdata, sum, na.rm=TRUE)
-hist(totalNewSteps$steps)
+hist(totalNewSteps$steps, 
+     main="Mean total steps taken per day (with NA values imputed)", 
+     xlab="Steps", 
+     ylab="Number of Days", 
+     ylim=c(0,35),
+     col="green")
 
 meanNewSteps <- mean(totalNewSteps$steps)
 medianNewSteps <- median(totalNewSteps$steps)
@@ -79,6 +89,20 @@ medianNewSteps <- median(totalNewSteps$steps)
     `r sprintf("%.1f",meanNewSteps)`
 * The imputed median of the total number of steps taken per day is: 
     `r sprintf("%.1f",medianNewSteps)`
+
+## Do these values differ from the estimates from the first part of the assignment? 
+## What is the impact of imputing missing data on the estimates of the total daily number of steps?
+As can be seen by comparing the two histograms, the impact of imputing values 
+based on averages per day is that the number of days with a step count between 
+10,000 and 15,000 steps has increased to over 35 - whereas before imputing the 
+values, the number of days in this range was below 30. The mean number of steps 
+has not changes and this is due to the algorithm making use of the mean number 
+of steps to impute values. However the median has increased in line with an 
+increase in the total number of steps.
+
+
+
+
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
