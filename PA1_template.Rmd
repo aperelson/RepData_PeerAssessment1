@@ -1,10 +1,10 @@
 ---
 title: 'Reproducible Research: Peer Assessment 1'
 output:
-  word_document: default
-  pdf_document: default
   html_document:
     keep_md: yes
+  pdf_document: default
+  word_document: default
 ---
 
 ```{r setoptions, echo=FALSE}
@@ -46,7 +46,39 @@ max5Minute <- stepsToInterval[which.max(stepsToInterval$steps),]$interval
 
 
 ## Imputing missing values
+```{r}
+totalMissing <- sum(is.na(walkdata$steps))
+```
+* Total number of missing values in the dataset: `r totalMissing`
 
+```{r results="hide"}
+## Find the unique time slots:
+allTimeSlots <- unique(walkdata$interval)
+newdata <- walkdata
+
+## Set missing data to the average number of steps for that time slot
+## where there is not missing data
+## This strategy is the mean for that 5-minute interval
+setMissingData <- function(timeSlot) {
+    newdata[which(walkdata$interval==timeSlot & is.na(walkdata$steps)), ]$steps <<- 
+        mean(walkdata[which(walkdata$interval==timeSlot & !is.na(walkdata$steps)), ]$steps)
+}
+
+lapply(allTimeSlots, setMissingData)
+```
+
+```{r}
+totalNewSteps <- aggregate(steps~date, data=newdata, sum, na.rm=TRUE)
+hist(totalNewSteps$steps)
+
+meanNewSteps <- mean(totalNewSteps$steps)
+medianNewSteps <- median(totalNewSteps$steps)
+```
+
+* The imputed mean of the total number of steps taken per day is: 
+    `r sprintf("%.1f",meanNewSteps)`
+* The imputed median of the total number of steps taken per day is: 
+    `r sprintf("%.1f",medianNewSteps)`
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
