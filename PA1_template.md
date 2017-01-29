@@ -104,13 +104,37 @@ As can be seen by comparing the two histograms, the impact of imputing values
 based on averages per day is that the number of days with a step count between 
 10,000 and 15,000 steps has increased to over 35 - whereas before imputing the 
 values, the number of days in this range was below 30. The mean number of steps 
-has not changes and this is due to the algortihm making use of the mean number 
+has not changes and this is due to the algorithm making use of the mean number 
 of steps to impute values. However the median has increased in line with an 
 increase in the total number of steps.
 
 
-
-
-
-
 ## Are there differences in activity patterns between weekdays and weekends?
+
+```r
+## Create a new factor column with the Weekday or Weekend identifier:
+newdata$type_of_day <- weekdays(as.Date(newdata$date))
+newdata$type_of_day[newdata$type_of_day %in% c('Saturday','Sunday')] <-"Weekend"
+newdata$type_of_day[newdata$type_of_day != "Weekend"] <-"Weekday"
+newdata$type_of_day <- as.factor(newdata$type_of_day)
+
+Weekday_data <- subset(newdata, type_of_day=="Weekday")
+Weekday_stepsToInterval <- aggregate(steps~interval, data=Weekday_data, mean)
+
+Weekend_data <- subset(newdata, type_of_day=="Weekend")
+Weekend_stepsToInterval <- aggregate(steps~interval, data=Weekend_data, mean)
+
+## Create two line plots:
+par(mfrow=c(2,1), mar=c(4,4,2,1), oma=c(0,0,2,0))
+
+with(newdata, {
+    plot(steps~interval,data=Weekday_stepsToInterval,type="l",
+main="Steps for Weekdays", xlab="Time Interval", col="red")
+    plot(steps~interval,data=Weekend_stepsToInterval,type="l",
+main="Steps for Weekends", xlab="Time Interval", col="red")
+    })
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
+* From these two graphs it can be seen that over the weekend the step count is more evenly distributed throughout the day than during the week.
